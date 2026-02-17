@@ -52,9 +52,16 @@ export default function Scene3D({ searchParams = {} }) {
     const url = textFromUrl
       ? `${apiUrl}/api/text?text=${encodeURIComponent(textFromUrl)}`
       : `${apiUrl}/api/text`;
-    fetch(url)
-      .then((res) => res.json())
+    fetch(url, { credentials: 'include' })
+      .then((res) => {
+        if (res.status === 401) {
+          window.location.href = '/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
+          return;
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!data) return;
         setText(data.text ?? '');
         setLoading(false);
       })

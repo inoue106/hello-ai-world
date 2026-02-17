@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import Header from './components/Header';
 
 const Scene3D = dynamic(() => import('./components/Scene3D'), {
   ssr: false,
@@ -10,5 +11,10 @@ const Scene3D = dynamic(() => import('./components/Scene3D'), {
 });
 
 export default function Home({ searchParams }) {
-  return <Scene3D searchParams={searchParams} />;
+  return (
+    <>
+      <Header />
+      <Scene3D searchParams={searchParams} />
+    </>
+  );
 }
