@@ -1,4 +1,14 @@
-/** 表示用テキストを返す（フロントで3D表示する内容） */
-export async function GET() {
-  return Response.json({ text: 'Hello AI World' });
+/** 表示用テキストを返す。?text=xxx で上書き可能 */
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const text = searchParams.get('text')?.trim();
+  let value = 'Hello AI World';
+  if (text) {
+    try {
+      value = decodeURIComponent(text);
+    } catch {
+      value = text;
+    }
+  }
+  return Response.json({ text: value });
 }

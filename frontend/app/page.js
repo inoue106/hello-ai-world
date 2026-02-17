@@ -9,6 +9,6 @@ const Scene3D = dynamic(() => import('./components/Scene3D'), {
   ),
 });
 
-export default function Home() {
-  return <Scene3D />;
+export default function Home({ searchParams }) {
+  return <Scene3D searchParams={searchParams} />;
 }

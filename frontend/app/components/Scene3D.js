@@ -40,15 +40,19 @@ function Scene({ text }) {
   );
 }
 
-export default function Scene3D() {
+export default function Scene3D({ searchParams = {} }) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const textFromUrl = searchParams?.text;
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/text/`)
+    const url = textFromUrl
+      ? `${apiUrl}/api/text?text=${encodeURIComponent(textFromUrl)}`
+      : `${apiUrl}/api/text`;
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setText(data.text ?? '');
@@ -56,10 +60,10 @@ export default function Scene3D() {
       })
       .catch((err) => {
         setError(err.message);
-        setText('Hello AI World');
+        setText(textFromUrl || 'Hello AI World');
         setLoading(false);
       });
-  }, [apiUrl]);
+  }, [apiUrl, textFromUrl]);
 
   if (loading) {
     return (
