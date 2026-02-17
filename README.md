@@ -2,9 +2,16 @@
 
 Next.js（App Router + API Routes）で構成された Web アプリです。**Vercel だけで完結**してデプロイできます。
 
-- 3D で「Hello AI World」を表示（マウスで回転・ズーム可能）
-- 表示テキストは API で取得（`/api/text`）
-- **認証**: トップページと `/api/text` は Google OAuth 必須。`/api/health` は認証なし。許可ドメインは環境変数で指定。
+## 機能
+
+| 機能 | 説明 |
+|------|------|
+| **3D 表示** | テキストを立体表示。マウスで回転・ズーム・パン可能（OrbitControls）。日本語は Noto Sans JP で表示し、レイヤー重ねで立体感を再現。 |
+| **位置情報** | ブラウザの Geolocation API で現在地（緯度・経度）を取得。許可しない場合は従来の「Hello AI World」を表示。 |
+| **住所（都道府県・市町村）** | 緯度経度を Nominatim（OpenStreetMap）で逆ジオコーディングし、表示テキストの冒頭に「〇〇県〇〇市の…」のように含める。 |
+| **天気** | 現在地の今日・明日の天気を Open-Meteo API で取得。気温・天気コードを元に日本語で表示。 |
+| **Gemini 3（任意）** | `GEMINI_API_KEY` を設定すると、天気データを Gemini 3 Flash で自然な日本語に整形。未設定なら天気コードを自前で日本語化。 |
+| **認証** | トップページと `/api/text` は Google OAuth 必須。`/api/health` は認証なし。許可ドメインは環境変数 `ALLOWED_EMAIL_DOMAIN` で指定。 |
 
 ## 手元での動作確認
 
@@ -57,6 +64,6 @@ npx vercel
 | パス | 認証 | 説明 |
 |------|------|------|
 | `GET /api/health` | 不要 | ヘルスチェック `{"status":"ok"}` |
-| `GET /api/text` | 必要 | 3D 表示用テキスト `{"text":"Hello AI World"}`。`?text=xxx` で上書き可 |
+| `GET /api/text` | 必要 | 3D 表示用テキスト。`?lat=&lng=` で現在地の今日・明日の天気、`?text=xxx` で上書き可 |
 
-表示テキストを変える場合は `frontend/app/api/text/route.js` を編集してください。
+表示テキストを変える場合は `frontend/app/api/text/route.js` を編集してください。天気を Gemini で整形する場合は `frontend/.env` に `GEMINI_API_KEY` を設定（[Google AI Studio](https://aistudio.google.com/apikey) で取得）。
