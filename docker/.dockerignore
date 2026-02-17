@@ -1,0 +1,7 @@
+# 共通で使う .dockerignore の例（各 Dockerfile はコンテキストがルートのため backend/ frontend/ をコピー）
+__pycache__
+*.pyc
+.git
+.env*
+node_modules
+.next
