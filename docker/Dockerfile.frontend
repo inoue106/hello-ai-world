@@ -10,8 +10,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ ./
 
 ENV NEXT_TELEMETRY_DISABLED=1
-# ビルド時にバックエンドURLを渡す（composeで上書き可能）
-ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+# 空のときは同一オリジン（Next.js API Routes）を使用。外部 API を使うときだけ渡す
+ARG NEXT_PUBLIC_API_URL=
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN npm run build
