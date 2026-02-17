@@ -28,9 +28,14 @@ export async function POST(request) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
+    /** 環境変数 GEMINI_WEB_SEARCH=true のときのみ Google 検索グラウンディングを有効にする（デフォルトは無効） */
+    const useWebSearch = process.env.GEMINI_WEB_SEARCH === 'true';
+    const config = useWebSearch ? { tools: [{ googleSearch: {} }] } : undefined;
+
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt.trim(),
+      ...(config && { config }),
     });
 
     const text =
@@ -44,9 +49,22 @@ export async function POST(request) {
     return Response.json({ answer: text });
   } catch (error) {
     console.error('Chat API error:', error);
+
+    const status = error?.status ?? (error?.code === 429 ? 429 : 500);
+    if (status === 429) {
+      return Response.json(
+        {
+          error:
+            'APIの利用枠を超えました。プラン・請求を確認するか、しばらく時間をおいて再試行してください。' +
+            '（Google検索を無効にする場合は GEMINI_WEB_SEARCH=false を設定すると消費を抑えられます）',
+        },
+        { status: 429 }
+      );
+    }
+
     return Response.json(
-      { error: `エラーが発生しました: ${error.message}` },
-      { status: 500 }
+      { error: `エラーが発生しました: ${error?.message ?? String(error)}` },
+      { status: status >= 400 && status < 600 ? status : 500 }
     );
   }
 }

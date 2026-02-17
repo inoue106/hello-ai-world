@@ -23,45 +23,27 @@ export default function Home({ searchParams }) {
   return (
     <>
       <Header onAnswerReceived={handleAnswerReceived} />
-      <Scene3D searchParams={searchParams} />
+      <Scene3D searchParams={searchParams} overrideText={answer} />
       {answer && (
-        <div
+        <button
+          onClick={() => setAnswer('')}
           style={{
             position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: '24px',
-            background: 'rgba(0,0,0,0.8)',
-            borderTop: '1px solid rgba(255,255,255,0.2)',
+            bottom: 16,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '8px 16px',
+            background: 'rgba(0,0,0,0.7)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: 8,
             color: '#fff',
-            fontSize: '16px',
-            lineHeight: '1.6',
+            cursor: 'pointer',
+            fontSize: 14,
             zIndex: 10,
-            maxHeight: '40vh',
-            overflowY: 'auto',
           }}
         >
-          <div style={{ marginBottom: '8px', fontSize: '12px', color: '#888' }}>
-            AI回答:
-          </div>
-          <div>{answer}</div>
-          <button
-            onClick={() => setAnswer('')}
-            style={{
-              marginTop: '12px',
-              padding: '6px 12px',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: 6,
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
-          >
-            閉じる
-          </button>
-        </div>
+          3Dテキストをリセット
+        </button>
       )}
     </>
   );
