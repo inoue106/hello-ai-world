@@ -21,6 +21,10 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 1日
+  },
   callbacks: {
     async signIn({ account, profile }) {
       if (account?.provider !== 'google' || !profile?.email) return false;
