@@ -1,5 +1,8 @@
 /**
  * プロンプトを入力し、AI（Gemini）に問い合わせて回答を返す
+ * 
+ * TODO: 外部 AI サービスへのデータ送信について、機密情報や個人情報を入力しないよう
+ * ユーザーに注意喚起を行うUIを実装することが推奨されます。
  */
 import { GoogleGenAI } from '@google/genai';
 import { getServerSession } from 'next-auth';

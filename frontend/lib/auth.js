@@ -3,6 +3,8 @@ import GoogleProvider from 'next-auth/providers/google';
 /**
  * 許可するメールドメイン（環境変数 ALLOWED_EMAIL_DOMAIN）
  * 例: "company.com" または "company.com,other.com"
+ * 
+ * TODO: メールアドレスの収集・利用目的について、プライバシーポリシー等でユーザーに明示してください。
  */
 function getAllowedDomains() {
   const raw = process.env.ALLOWED_EMAIL_DOMAIN || '';
