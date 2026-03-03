@@ -2,6 +2,8 @@
  * 表示用テキストを返す。
  * - ?text=xxx で上書き可能
  * - ?lat=...&lng=... がある場合: 現在地の今日・明日の天気を Gemini 3 で生成して返す
+ * 
+ * TODO: 位置情報の収集・利用目的について、プライバシーポリシー等でユーザーに明示してください。
  */
 import { GoogleGenAI } from '@google/genai';
 
@@ -107,9 +109,12 @@ export async function GET(request) {
       value = textParam;
     }
   } else if (lat != null && lng != null && lat !== '' && lng !== '') {
-    const latNum = parseFloat(lat);
-    const lngNum = parseFloat(lng);
+    let latNum = parseFloat(lat);
+    let lngNum = parseFloat(lng);
     if (Number.isFinite(latNum) && Number.isFinite(lngNum)) {
+      // データ最小化のため、位置情報を小数点以下2桁（約1km精度）に丸める
+      latNum = Math.round(latNum * 100) / 100;
+      lngNum = Math.round(lngNum * 100) / 100;
       try {
         const [weatherJson, locationName] = await Promise.all([
           fetchWeather(latNum, lngNum),
