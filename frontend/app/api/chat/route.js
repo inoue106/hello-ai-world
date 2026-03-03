@@ -51,7 +51,8 @@ export async function POST(request) {
 
     return Response.json({ answer: text });
   } catch (error) {
-    console.error('Chat API error:', error);
+    // DATA-001: ログに個人情報や機密情報が含まれないよう、エラーオブジェクト全体ではなくメッセージのみを出力する
+    console.error('Chat API error:', error?.message ?? String(error));
 
     const status = error?.status ?? (error?.code === 429 ? 429 : 500);
     if (status === 429) {
