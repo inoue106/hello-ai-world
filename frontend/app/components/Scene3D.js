@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Text, Center, OrbitControls } from '@react-three/drei';
 
@@ -55,135 +55,17 @@ function Scene({ text }) {
   );
 }
 
-export default function Scene3D({ searchParams = {} }) {
-  const [text, setText] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+export default function Scene3D({ searchParams = {}, overrideText }) {
+  /** 起動時はAPIでテキストを取得せず、すぐ入力画面を表示する */
   const textFromUrl = searchParams?.text;
-
-  useEffect(() => {
-    const doFetch = (lat, lng) => {
-      const params = new URLSearchParams();
-      if (textFromUrl) {
-        params.set('text', textFromUrl);
-      } else if (lat != null && lng != null) {
-        params.set('lat', String(lat));
-        params.set('lng', String(lng));
-      }
-      const url = `${apiUrl}/api/text${params.toString() ? `?${params}` : ''}`;
-      return fetch(url, { credentials: 'include' });
-    };
-
-    if (textFromUrl) {
-      doFetch()
-        .then((res) => {
-          if (res?.status === 401) {
-            window.location.href = '/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
-            return;
-          }
-          return res?.json();
-        })
-        .then((data) => {
-          if (!data) return;
-          setText(data.text ?? '');
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setText(textFromUrl || 'Hello AI World');
-          setLoading(false);
-        });
-      return;
-    }
-
-    if (!navigator.geolocation) {
-      doFetch()
-        .then((res) => {
-          if (res?.status === 401) {
-            window.location.href = '/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
-            return;
-          }
-          return res?.json();
-        })
-        .then((data) => {
-          if (!data) return;
-          setText(data.text ?? '');
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setText('Hello AI World');
-          setLoading(false);
-        });
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        doFetch(latitude, longitude)
-          .then((res) => {
-            if (res?.status === 401) {
-              window.location.href = '/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
-              return;
-            }
-            return res?.json();
-          })
-          .then((data) => {
-            if (!data) return;
-            setText(data.text ?? '');
-            setLoading(false);
-          })
-          .catch((err) => {
-            setError(err.message);
-            setText('Hello AI World');
-            setLoading(false);
-          });
-      },
-      () => {
-        doFetch()
-          .then((res) => {
-            if (res?.status === 401) {
-              window.location.href = '/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
-              return;
-            }
-            return res?.json();
-          })
-          .then((data) => {
-            if (!data) return;
-            setText(data.text ?? '');
-            setLoading(false);
-          })
-          .catch((err) => {
-            setError(err.message);
-            setText('Hello AI World');
-            setLoading(false);
-          });
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-    );
-  }, [apiUrl, textFromUrl]);
-
-  if (loading) {
-    return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', color: '#888' }}>
-        読み込み中...
-      </div>
-    );
-  }
+  /** AI回答など、親から渡されたテキストがあれば3D表示に使う */
+  const displayText = (overrideText && String(overrideText).trim()) ? String(overrideText).trim() : textFromUrl || '';
 
   return (
     <div style={{ width: '100%', height: '100vh', background: '#0a0a0f' }}>
       <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-        <Scene text={text} />
+        <Scene text={displayText || 'プロンプトを入力して送信'} />
       </Canvas>
-      {error && (
-        <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', color: '#c44', fontSize: 12 }}>
-          API: {error}（フォールバック表示）
-        </div>
-      )}
     </div>
   );
 }
